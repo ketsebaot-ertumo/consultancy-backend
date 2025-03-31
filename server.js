@@ -1,0 +1,42 @@
+require('dotenv').config();
+const express = require('express');
+const morgan = require('morgan');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
+const { sequelize } = require('./models');
+
+const app = express();
+
+const PORT = process.env.PORT || 4000;
+sequelize
+    .authenticate()
+    .then(() => {
+        console.log('Connected to the database');
+        server.listen(PORT, () => {
+            console.log(`🚀 Server is running on http://localhost:${PORT}`);
+        });
+    })
+    .catch((error) => {
+        console.error('❌ Unable to connect to the database:', error);
+    });
+
+app.use(morgan('dev'));
+app.use(bodyParser.json({ limit: "25mb" }));
+app.use(bodyParser.urlencoded({ limit: "25mb", extended: true }));
+app.use(cookieParser());
+app.use(cors());
+
+app.get("/", (req, res) => {
+    res.send("Welcome to `Consultancy Website Backend`!");
+});
+
+const authRoute = require('./routes/authRoute');
+const userRoute = require('./routes/userRoute');
+// const notificationRoute = require('./routes/notificationRoute');
+const blogRoutes = require('./routes/blogRoutes');
+
+app.use('/api/auth', authRoute);
+app.use('/api/user', userRoute);
+// app.use('/api/notification', notificationRoute);
+app.use('/api/blog', blogRoutes);
